@@ -164,6 +164,7 @@ const deleteOtp = await OTP.deleteMany({ email })
             accountType,
             additionalDetails: profile._id
         })
+        
         return res.status(200).json({
             success: true,
             message: "User registered successfully",

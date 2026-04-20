@@ -36,7 +36,16 @@ exports.getAllTags = async(req,res)=>{
     try{
         const allTags = await Tag.find({})
 
+if (!allTags.length) {
+  return res.status(404).json({
+    success: false,
+    message: "No tags found",
+    data:allTags
+  });
+}
+
         console.log("All tags ->",allTags)
+
         return res.status(200).json(({
             success:true,
             message:"All tags returned successfully"
