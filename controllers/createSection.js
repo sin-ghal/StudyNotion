@@ -82,9 +82,25 @@ exports.deleteSection = async (req,res)=>{
         //get id - sending id in params
         const {sectionId,courseId} = req.params
 
+        const existingSection = await Section.findById(sectionId)
+        if(!existingSection){
+            return res.status(404).json({
+                success: false,
+                message: "Section not found",
+            });
+        }
+
+        const existingCourse = await Course.findById(courseId)
+        if(!existingCourse){
+            return res.status(404).json({
+                success: false,
+                message: "Course not found",
+            });
+        }
+
         await Section.findByIdAndDelete(sectionId)
 
-        await Course.findByIdAndUpdate(courseId,
+        const newCourse = await Course.findByIdAndUpdate(courseId,
             {
                 $pull:{
                     courseContent:sectionId
@@ -100,6 +116,7 @@ exports.deleteSection = async (req,res)=>{
         return res.status(200).json({
             success:true,
             message:"Section deleted Successfully",
+            data:newCourse
         })
 
     }catch(e){

@@ -18,6 +18,13 @@ exports.createSubSection = async (req, res) => {
                 message: "All fields are required",
             });
         }
+        const existingSection = await Section.findById(sectionId)
+        if(!existingSection){
+             return res.status(404).json({
+                success: false,
+                message: "Section not found",
+            });
+        }
 
         //upload video to cloudinary
         const cloudinaryInfo = await uploadToCloudinary(videofile, process.env.FOLDER_NAME)
@@ -38,9 +45,7 @@ exports.createSubSection = async (req, res) => {
             },
             { new: true }
         ).populate({ path: "subSection" })
-
         
-
         //return response
         return res.status(200).json({
             success: true,
@@ -75,7 +80,7 @@ exports.updateSubSection = async (req, res) => {
         }
 
 //get the data
-        let existingSubSection  = await subSection.findById(subSectionId)
+        const existingSubSection  = await subSection.findById(subSectionId)
         if(!existingSubSection){
             return res.status(404).json({
                 success: false,
@@ -87,6 +92,7 @@ exports.updateSubSection = async (req, res) => {
         let publicIdforCloudinary
         if(videofile){
             if(existingSubSection.publicIdforCloudinary){
+                //delte the old video
                 try
                 {
                     await cloudinary.uploader.destroy(existingSubSection.publicIdforCloudinary,
@@ -98,7 +104,7 @@ exports.updateSubSection = async (req, res) => {
             console.error("Failed to delete old video:", e);
             }
             }
-            
+            //add the new video
             const cloudinaryInfo = await uploadToCloudinary(videofile,process.env.FOLDER_NAME)
             videoUrl=cloudinaryInfo.secure_url
             publicIdforCloudinary=cloudinaryInfo.public_id
