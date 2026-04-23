@@ -4,6 +4,9 @@ const Tag = require("../models/tags")
 const User = require("../models/user")
 const Course = require("../models/course")
 
+const Section = require("../models/Section")
+const { populate } = require("../models/Rating&Reviews")
+
 exports.createCourse = async (req,res) =>{
     //data fetch 
     try{
@@ -133,4 +136,51 @@ exports.getAllCourses = async (req,res)=>{
       message: "Failed to get all course",
     });
   }
+}
+
+//get course details for a particular course
+exports.getCourseDetails = async (req,res)=>{
+  try{
+    const {courseId} = req.body
+
+    const courseDetails = await Course.findById(
+      courseId)
+    .populate([
+      {
+        path:"instructor",
+        populate:{path:"additionalDetails"}
+      },
+      {
+        path:"courseContent",
+          populate:{path:"subSection",select:"timeDuration videoUrl"}
+      },
+      {
+        path:"ratingAndReviews",
+      },
+      {
+        path:"studentsEnrolled",
+        populate:{path:"additionalDetails"}
+      }
+    ])
+    if (!courseDetails) {
+      return res.status(400).json({
+        success: false,
+        message: `Could not find course with id: ${courseId}`,
+      })
+    }
+    
+    return res.status(200).json({
+      success: true,
+      data: {
+        courseDetails,
+      }
+    })
+
+  } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        })
+    }
 }
