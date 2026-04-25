@@ -1,6 +1,6 @@
 const { uploadToCloudinary } = require("../utils/uploadToCloudinary")
 
-const Tag = require("../models/tags")
+const Category = require("../models/categorys")
 const User = require("../models/user")
 const Course = require("../models/course")
 
@@ -15,7 +15,7 @@ exports.createCourse = async (req,res) =>{
         courseDescription,
         whatYouWillLearn,
         price,
-        tag
+        category
     } = req.body
 
     //fetch thumbnail
@@ -27,7 +27,7 @@ exports.createCourse = async (req,res) =>{
       !courseDescription ||
       !whatYouWillLearn ||
       !price ||
-      !tag ||
+      !category ||
       !thumbnail
     ) {
       return res.status(400).json({
@@ -47,11 +47,11 @@ exports.createCourse = async (req,res) =>{
     //   })
     // }
 
-    const tagDetails = await Tag.findOne({name : tag})
-    if(!tagDetails){
+    const categoryDetails = await Category.findOne({name : category})
+    if(!categoryDetails){
         return res.status(400).json({
         success: false,
-        message: "Tag details not found",
+        message: "Category details not found",
       })
     }
 
@@ -68,7 +68,7 @@ exports.createCourse = async (req,res) =>{
         courseDescription,
         whatYouWillLearn,
         price,
-        tag:tagDetails._id,
+        category:categoryDetails._id,
         instructor:req.user.id,
         thumbnail:responseFromCloudinary.secure_url
     })
@@ -84,9 +84,9 @@ exports.createCourse = async (req,res) =>{
     {new:true}
   )
 
-  //update tag schema
-  await Tag.findByIdAndUpdate(
-    tagDetails._id,
+  //update category schema
+  await Category.findByIdAndUpdate(
+    categoryDetails._id,
     {
       $push:{
         courses:newCourse._id
@@ -115,7 +115,7 @@ exports.getAllCourses = async (req,res)=>{
     //fetch all courses
     const allCourses = await Course.find({})
     .populate("instructor")
-    .populate("tag")
+    .populate("category")
 
     //check if courses are not found
     if (!allCourses.length) {

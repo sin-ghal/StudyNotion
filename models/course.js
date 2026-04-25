@@ -45,6 +45,11 @@ const courseSchema = new mongoose.Schema({
 	thumbnail: {
 		type: String,
 	},
+	category: {
+		type: mongoose.Schema.Types.ObjectId,
+		// required: true,
+		ref: "Category",
+	}
 
 });
 

@@ -52,7 +52,7 @@ exports.createRatingAndReview = async (req, res) => {
             review
         })
 
-        //update rating and reviews        
+        //update rating and reviews in course       
         const updatedCourse = await Course.findByIdAndUpdate(courseId,
             {
                 $push: {
